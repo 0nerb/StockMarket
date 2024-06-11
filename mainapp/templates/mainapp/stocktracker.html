@@ -3,7 +3,7 @@
 
 {% block title %}
 {% load myfilters %}
-StockTracker
+
 {% endblock %} 
 
 {% block css %}
@@ -21,6 +21,7 @@ StockTracker
           <tr>
             <th scope="col">Stock</th>
             <th scope="col">Price</th>
+            <th scope="col">Timer(minutes)</th>
           </tr>
         </thead>
         <tbody>
@@ -29,7 +30,15 @@ StockTracker
             
             <td>{{ key }}</td>
             <td>{{ value }}</td>
-
+            <td>
+              <div>
+                <div class="timer" style="display: flex">
+                  <input type="number" class="form-control" id="inputTimer" name="inputTimer">
+                  <button class="btn btn-outline-success" type="submit" value="submit" onClick="inicia()">Submit</button>
+                </div>
+                  <div id="tempo"></div>
+              </div>
+            </td>
           </tr>
           {% endfor %}
         </tbody>
@@ -40,6 +49,21 @@ StockTracker
 
 {% block js %}
 <script>
+  var val;
+  var time;
 
+  function inicia(){
+      val = document.getElementById('inputTimer');
+      time = Number(val.value)*60;
+      setTimeout("contador()", 6000);
+  }
+  
+  function contador(){
+      if(time > 0){
+        time = time -1;
+      }
+      document.getElementById("tempo").innerHTML = time;
+      setTimeout("contador()", 1000);
+  }
 </script>
 {% endblock %}

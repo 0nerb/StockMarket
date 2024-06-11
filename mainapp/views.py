@@ -36,7 +36,7 @@ def stockTracker(request):
             historical_prices = stock.history(period='1d', interval='1m')
             latest_price = historical_prices['Close'].iloc[-1]
         except:
-            return HttpResponse("possibly delisted; No price data found")
+            return HttpResponse(f"Not found data from {i}")
         
         
         data.update({i: latest_price})
