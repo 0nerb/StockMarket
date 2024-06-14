@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-{% load myfilters %}
+
 
 {% endblock %} 
 
@@ -27,20 +27,59 @@
         <tbody>
           {% for key, value in data.items %}
           <tr>
-            
-            <td>{{ key }}</td>
-            <td>{{ value }}</td>
+            <td id="symbol-{{key}}">{{ key }}</td>
+            <td id="stock-price-{{key}}">{{ value }}</td>
             <td>
               <div>
                 <div class="timer" style="display: flex">
-                  <input type="number" class="form-control" id="inputTimer" name="inputTimer">
+                  <input type="number" class="form-control" id="inputTimer-{{key}}" name="inputTimer">
                   <button class="btn btn-outline-success" type="submit" value="submit" onClick="inicia()">Submit</button>
                 </div>
-                  <div id="tempo"></div>
+                  <div id="tempo-{{key}}" name="tempo">0</div>
               </div>
             </td>
+            <script>
+              var time = 0; // estão compartilhando o msm time
+              var interval;
+                   
+              function inicia(){
+                  const val = event.target
+                  const tr = val.closest('tr')
+                  const symbolTd = tr.querySelector('td[id^="symbol-"]');
+                  const symbol = symbolTd.textContent;
+                  time = Number(tr.querySelector('input[name="inputTimer"]').value)*60;
+                  interval = time;
+                  setInterval(() => {contador(symbol)}, 1000);         
+                  
+              }
+              
+              function contador(symbol){
+                const individualTime = document.getElementById(`tempo-${symbol}`);
+                if(time > 0){
+                    time = time - 1;
+                  }
+                  if(time == 0){
+                    time = interval
+                    $.ajax({
+                      url: "/update",
+                      type: "GET",
+                          data: {
+                            Key: symbol,
+                      },
+                  
+                    }).done(function(response) {
+                      symbolValue = document.getElementById(`stock-price-${symbol}`)
+                      symbolValue.innerText = response
+                      alert("Value of " +symbol+ " changed!")
+                      
+                    });
+                    
+                  }
+                  individualTime.innerText = time;
+              }
+            </script>
           </tr>
-          {% endfor %}
+          {% endfor %}         
         </tbody>
       </table>
 
@@ -48,22 +87,5 @@
 {% endblock %}
 
 {% block js %}
-<script>
-  var val;
-  var time;
 
-  function inicia(){
-      val = document.getElementById('inputTimer');
-      time = Number(val.value)*60;
-      setTimeout("contador()", 6000);
-  }
-  
-  function contador(){
-      if(time > 0){
-        time = time -1;
-      }
-      document.getElementById("tempo").innerHTML = time;
-      setTimeout("contador()", 1000);
-  }
-</script>
 {% endblock %}
