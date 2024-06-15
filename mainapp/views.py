@@ -1,15 +1,25 @@
 from django.shortcuts import render
-from django.http.response import HttpResponse, HttpResponseRedirect
+from django.http.response import HttpResponse
 from threading import *
 import yfinance as yf
-from django.urls import reverse
 import investpy as inv
+from .forms import EmailForm
+from .models import Email
 
 # Create your views here.
 def stockPicker(request):
     stock_picker = inv.stocks.get_stocks(country='brazil')
+    # Initialize the form
+    if request.method == 'POST':
+        form = EmailForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            Email.objects.create(address=email)
+            return HttpResponse('Thank you for submitting your email!')
+    else:
+        form = EmailForm()
     
-    return render(request,'mainapp/stockpicker.html', {"stockpicker": stock_picker['symbol']})
+    return render(request,'mainapp/stockpicker.html', {"stockpicker": stock_picker['symbol'], 'form': form})
 
 def stockTracker(request):
     stockpicker = request.GET.getlist('stockpicker')
@@ -45,3 +55,6 @@ def update(request):
         return HttpResponse(f"Not found data from {stock}")
     
     return HttpResponse(latest_price)
+
+
+

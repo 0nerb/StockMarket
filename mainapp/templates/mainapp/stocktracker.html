@@ -33,33 +33,31 @@
               <div>
                 <div class="timer" style="display: flex">
                   <input type="number" class="form-control" id="inputTimer-{{key}}" name="inputTimer">
-                  <button class="btn btn-outline-success" type="submit" value="submit" onClick="inicia()">Submit</button>
+                  <button class="btn btn-outline-success" type="submit" value="submit" onClick="inicia('{{key}}')">Submit</button>
                 </div>
                   <div id="tempo-{{key}}" name="tempo">0</div>
               </div>
             </td>
             <script>
-              var time = 0; // estão compartilhando o msm time
-              var interval;
-                   
-              function inicia(){
+              var time = {};
+              var interval = {};
+             
+              function inicia(symbol){
                   const val = event.target
                   const tr = val.closest('tr')
-                  const symbolTd = tr.querySelector('td[id^="symbol-"]');
-                  const symbol = symbolTd.textContent;
-                  time = Number(tr.querySelector('input[name="inputTimer"]').value)*60;
-                  interval = time;
+                  time[symbol] = Number(tr.querySelector('input[name="inputTimer"]').value)*60;
+                  interval[symbol] = time[symbol];
                   setInterval(() => {contador(symbol)}, 1000);         
                   
               }
               
               function contador(symbol){
                 const individualTime = document.getElementById(`tempo-${symbol}`);
-                if(time > 0){
-                    time = time - 1;
+                if(time[symbol] > 0){
+                    time[symbol] = time[symbol] - 1;
                   }
-                  if(time == 0){
-                    time = interval
+                  if(time[symbol] == 0){
+                    time[symbol] = interval[symbol]
                     $.ajax({
                       url: "/update",
                       type: "GET",
@@ -70,12 +68,11 @@
                     }).done(function(response) {
                       symbolValue = document.getElementById(`stock-price-${symbol}`)
                       symbolValue.innerText = response
-                      alert("Value of " +symbol+ " changed!")
                       
                     });
                     
                   }
-                  individualTime.innerText = time;
+                  individualTime.innerText = time[symbol];
               }
             </script>
           </tr>
