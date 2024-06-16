@@ -21,6 +21,10 @@
           <tr>
             <th scope="col">Stock</th>
             <th scope="col">Price</th>
+            <th scope="col">Low</th>
+            <th scope="col">High</th>
+            <th scope="col">Close</th>
+            <th scope="col">Volume</th>
             <th scope="col">Timer(minutes)</th>
           </tr>
         </thead>
@@ -28,7 +32,12 @@
           {% for key, value in data.items %}
           <tr>
             <td id="symbol-{{key}}">{{ key }}</td>
-            <td id="stock-price-{{key}}">{{ value }}</td>
+            <td id="stock-price-{{key}}">{{ value.Open }}</td>
+            <td id="stock-price-{{key}}">{{ value.High }}</td>
+            <td id="stock-price-{{key}}">{{ value.Low }}</td>
+            <td id="stock-price-{{key}}">{{ value.Close }}</td>
+            <td id="stock-price-{{key}}">{{ value.Volume }}</td>
+
             <td>
               <div>
                 <div class="timer" style="display: flex">

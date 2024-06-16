@@ -32,15 +32,16 @@ def stockTracker(request):
 
     for i in available_stocks:
         stock = yf.Ticker(i)
-
+        
         try:
             historical_prices = stock.history(period='1d', interval='1m')
-            latest_price = historical_prices['Close'].iloc[-1]
+            atual = historical_prices.iloc[-1]
+
         except:
             return HttpResponse(f"Not found data from {i}")
         
         
-        data.update({i: latest_price})
+        data.update({i: atual})
     print(data)
     return render(request,'mainapp/stocktracker.html', {'data': data})
 
