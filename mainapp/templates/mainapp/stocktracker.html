@@ -6,11 +6,7 @@
 
 {% endblock %} 
 
-{% block css %}
-<style>
 
-</style>
-{% endblock %}
 
 {% block body %}
 <div class="container">
@@ -21,8 +17,8 @@
           <tr>
             <th scope="col">Stock</th>
             <th scope="col">Price</th>
-            <th scope="col">Low</th>
             <th scope="col">High</th>
+            <th scope="col">Low</th>
             <th scope="col">Close</th>
             <th scope="col">Volume</th>
             <th scope="col">Timer(minutes)</th>
@@ -33,10 +29,10 @@
           <tr>
             <td id="symbol-{{key}}">{{ key }}</td>
             <td id="stock-price-{{key}}">{{ value.Open }}</td>
-            <td id="stock-price-{{key}}">{{ value.High }}</td>
-            <td id="stock-price-{{key}}">{{ value.Low }}</td>
-            <td id="stock-price-{{key}}">{{ value.Close }}</td>
-            <td id="stock-price-{{key}}">{{ value.Volume }}</td>
+            <td id="stock-high-{{key}}">{{ value.High }}</td>
+            <td id="stock-low-{{key}}">{{ value.Low }}</td>
+            <td id="stock-close-{{key}}">{{ value.Close }}</td>
+            <td id="stock-volume-{{key}}">{{ value.Volume }}</td>
 
             <td>
               <div>
@@ -47,43 +43,7 @@
                   <div id="tempo-{{key}}" name="tempo">0</div>
               </div>
             </td>
-            <script>
-              var time = {};
-              var interval = {};
-             
-              function inicia(symbol){
-                  const val = event.target
-                  const tr = val.closest('tr')
-                  time[symbol] = Number(tr.querySelector('input[name="inputTimer"]').value)*60;
-                  interval[symbol] = time[symbol];
-                  setInterval(() => {contador(symbol)}, 1000);         
-                  
-              }
-              
-              function contador(symbol){
-                const individualTime = document.getElementById(`tempo-${symbol}`);
-                if(time[symbol] > 0){
-                    time[symbol] = time[symbol] - 1;
-                  }
-                  if(time[symbol] == 0){
-                    time[symbol] = interval[symbol]
-                    $.ajax({
-                      url: "/update",
-                      type: "GET",
-                          data: {
-                            Key: symbol,
-                      },
-                  
-                    }).done(function(response) {
-                      symbolValue = document.getElementById(`stock-price-${symbol}`)
-                      symbolValue.innerText = response
-                      
-                    });
-                    
-                  }
-                  individualTime.innerText = time[symbol];
-              }
-            </script>
+           
           </tr>
           {% endfor %}         
         </tbody>
@@ -93,5 +53,43 @@
 {% endblock %}
 
 {% block js %}
-
+<script>
+  var time = {};
+  var interval = {};
+ 
+  function inicia(symbol){
+      const val = event.target
+      const tr = val.closest('tr')
+      time[symbol] = Number(tr.querySelector('input[name="inputTimer"]').value)*60;
+      interval[symbol] = time[symbol];
+      setInterval(() => {contador(symbol)}, 1000);         
+      
+  }
+  
+  function contador(symbol){
+    const individualTime = document.getElementById(`tempo-${symbol}`);
+    const value = document.getElementById(`stock-price-${symbol}`).innerHTML;
+    if(time[symbol] > 0){
+        time[symbol] = time[symbol] - 1;
+      }
+      if(time[symbol] == 0){
+        time[symbol] = interval[symbol]
+        $.ajax({
+          url: "/update",
+          type: "GET",
+              data: {
+                Key: symbol,
+                Price: value, 
+          },
+      
+        }).done(function(response) {
+          symbolValue = document.getElementById(`stock-price-${symbol}`)
+          symbolValue.innerText = response
+          
+        });
+        
+      }
+      individualTime.innerText = time[symbol];
+  }
+</script>
 {% endblock %}
